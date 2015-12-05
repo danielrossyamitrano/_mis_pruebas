@@ -1,0 +1,25 @@
+{
+    "0":{"type":"Selector","children":[1,11]},
+    
+    "1":{"type":"Secuence","children":[2,3,4,5]},
+    "2":{"type":"Leaf","script":"Walk", "context":["door"]},
+    "3":{"type":"Selector","children":[6,7,8]},
+    "4":{"type":"Leaf","script":"Walk", "context":["door"]},
+    "5":{"type":"Leaf","script":"Close", "context":["openable"]},
+    "6":{"type":"Leaf","script":"Open", "context":["openable"]},
+    "7":{"type":"Secuence","children":[9,10]},
+    "8":{"type":"Leaf","script":"Smash", "context":["openable"]},
+    "9":{"type":"Leaf","script":"Unlock", "context":["openable"]},
+    "10":{"type":"Leaf","script":"Open", "context":["openable"]},
+    
+    "11":{"type":"Secuence","children":[12,13,14,15]},
+    "12":{"type":"Leaf","script":"Walk", "context":["window"]},
+    "13":{"type":"Selector","children":[16,17,18]},
+    "14":{"type":"Leaf","script":"Walk", "context":["window"]},
+    "15":{"type":"Leaf","script":"Close", "context":["openable"]},
+    "16":{"type":"Leaf","script":"Open", "context":["openable"]},
+    "17":{"type":"Secuence","children":[19,20]},
+    "18":{"type":"Leaf","script":"Smash", "context":["openable"]},
+    "19":{"type":"Leaf","script":"Unlock", "context":["openable"]},
+    "20":{"type":"Leaf","script":"Open", "context":["openable"]},
+}
