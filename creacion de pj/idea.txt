@@ -1,0 +1,1 @@
+﻿Se me ocurre también que por cada año en la vida del personaje, haya un porcentaje de probablidad de que haya un evento en la vida. Si en el año anterior no hubo eventos, entonces la probablidad de que suceda algo en el año corriente es mayor, si no, vuelve al valor base (que es relativo al año actual)
