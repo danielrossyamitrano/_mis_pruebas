@@ -1,7 +1,7 @@
 {
     "0": {"type":"Secuence","children":[1,2,3]},
     "1": {"type":"Leaf","script":"GetStackFrom", "context":["door","building"]},
-    "2": {"type":"Decorator","script":"Until_fail","child":"4"},
+    "2": {"type":"Decorator","script":"UntilFail","child":"4"},
     "3": {"type":"Decorator","script":"Inverter", "child":"5"},
     
     "4": {"type":"Secuence","children":[6,7]},
@@ -12,7 +12,7 @@
     "8": {"type":"Secuence","children":[9,10,11,12,13]},
     "9": {"type":"Leaf","script":"Walk_to", "context":["door"]},
     
-    "10":{"type":"Selector","children":[14,15,16]}
+    "10":{"type":"Selector","children":[14,15,16]},
     "11":{"type":"Leaf","script":"Walk_thru", "context":["door"]},
     "12":{"type":"Decorator","script":"Succeeder","child":"17"},
     "13":{"type":"Leaf","script":"SetVariable", "context":["door","usedDoor"]},
