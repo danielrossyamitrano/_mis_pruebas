@@ -1,28 +1,28 @@
 {
-    "0":{"parent":  null, "type":"Selector","children":[1,11]},
+    "0":{"type":"Selector","children":[1,11]},
     
-    "1":{"parent":  0, "type":"Secuence","children":[2,3,4,5]},
-    "2":{"parent":  1, "type":"Leaf","script":"Walk", "context":["door"]},
-    "3":{"parent":  1, "type":"Selector","children":[6,7,8]},
-    "4":{"parent":  1, "type":"Leaf","script":"Walk", "context":["door"]},
-    "5":{"parent":  1, "type":"Leaf","script":"Close", "context":["openable"]},
-    "6":{"parent":  2, "type":"Leaf","script":"Open", "context":["openable"]},
+    "1":{"type":"Secuence","children":[2,3,4,5]},
+    "2":{"type":"Leaf","script":"_walk", "context":["door"]},
+    "3":{"type":"Selector","children":[6,7,8]},
+    "4":{"type":"Leaf","script":"_walk", "context":["door"]},
+    "5":{"type":"Leaf","script":"_close", "context":["openable"]},
+    "6":{"type":"Leaf","script":"_open", "context":["openable"]},
     
-    "7":{"parent":  2, "type":"Secuence","children":[9,10]},
-    "8":{"parent":  2, "type":"Leaf","script":"Smash", "context":["openable"]},
-    "9":{"parent":  7, "type":"Leaf","script":"Unlock", "context":["openable"]},
-    "10":{"parent": 7, "type":"Leaf","script":"Open", "context":["openable"]},
+    "7":{"type":"Secuence","children":[9,10]},
+    "8":{"type":"Leaf","script":"_smash", "context":["openable"]},
+    "9":{"type":"Leaf","script":"_unlock", "context":["openable"]},
+    "10":{"type":"Leaf","script":"_open", "context":["openable"]},
     
-    "11":{"parent": 0, "type":"Secuence","children":[12,13,14,15]},
-    "12":{"parent":11, "type":"Leaf","script":"Walk", "context":["window"]},
+    "11":{"type":"Secuence","children":[12,13,14,15]},
+    "12":{"type":"Leaf","script":"_walk", "context":["window"]},
     
-    "13":{"parent":11, "type":"Selector","children":[16,17,18]},
-    "14":{"parent":11, "type":"Leaf","script":"Walk", "context":["window"]},
-    "15":{"parent":11, "type":"Leaf","script":"Close", "context":["openable"]},
-    "16":{"parent":13, "type":"Leaf","script":"Open", "context":["openable"]},
+    "13":{"type":"Selector","children":[16,17,18]},
+    "14":{"type":"Leaf","script":"_walk", "context":["window"]},
+    "15":{"type":"Leaf","script":"_close", "context":["openable"]},
+    "16":{"type":"Leaf","script":"_open", "context":["openable"]},
     
-    "17":{"parent":13, "type":"Secuence","children":[19,20]},
-    "18":{"parent":13, "type":"Leaf","script":"Smash", "context":["openable"]},
-    "19":{"parent":17, "type":"Leaf","script":"Unlock", "context":["openable"]},
-    "20":{"parent":17, "type":"Leaf","script":"Open", "context":["openable"]}
+    "17":{"type":"Secuence","children":[19,20]},
+    "18":{"type":"Leaf","script":"_smash", "context":["openable"]},
+    "19":{"type":"Leaf","script":"_unlock", "context":["openable"]},
+    "20":{"type":"Leaf","script":"_open", "context":["openable"]}
 }

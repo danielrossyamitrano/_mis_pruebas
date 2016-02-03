@@ -1,5 +1,5 @@
 import json
-from clases import *
+from clases import BehaviourTree
 
 def abrir_json (archivo):
     ex = open(archivo,'r')
@@ -7,7 +7,9 @@ def abrir_json (archivo):
     ex.close()
     return data
 
-file = abrir_json('example_2.json')
-
+file = abrir_json('example_1.json')
 
 b = BehaviourTree(file)
+
+for i in range(5):
+    b.update()
