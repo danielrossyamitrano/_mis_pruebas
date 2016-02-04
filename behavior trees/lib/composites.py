@@ -1,7 +1,8 @@
 from .status import *
 from .node import Node
 
-__all__ = ['Composite','Secuence','Selector']
+__all__ = ['Composite', 'Secuence', 'Selector']
+
 
 class Composite(Node):
     type = 'Composite'
@@ -16,7 +17,7 @@ class Composite(Node):
         for child in children:
             self.children.append(child)
         self.current_id = 0
-    
+
     def update(self):
         child = self.children[self.current_id]
         child.update()
@@ -27,19 +28,19 @@ class Secuence(Composite):
 
     def __repr__(self):
         lista = [str(c.idx) for c in self.children]
-        return str(self.idx) + ' ' + self.type + ' ' + self.name + ' (' + ','.join(lista) + ')'
-    
+        return ' '.join([self.type, '#' + str(self.idx), self.name, '(' + ', '.join(lista) + ')'])
+
     def get_child_status(self, status):
         if status is Running:
             self.tree.set_to_check(self.children[self.current_id])
 
         elif status is Success:
-            self.current_id += 1
-            if self.current_id == len(self.children)-1:
+            if self.current_id + 1 == len(self.children):
                 status = Success
             else:
+                self.current_id += 1
                 status = Running
-        
+
         if self.parent is not None:
             self.parent.get_child_status(status)
 
@@ -51,17 +52,18 @@ class Selector(Composite):
     name = 'Selector'
 
     def __repr__(self):
-        return str(self.idx) + ' ' + self.type + ' ' + self.name + ' (' + ','.join([str(c) for c in self.children]) + ')'
+        lista = [str(c.idx) for c in self.children]
+        return ' '.join([self.type, '#' + str(self.idx), self.name, '(' + ', '.join(lista) + ')'])
 
     def get_child_status(self, status):
         if status is Running:
             self.tree.set_to_check(self.children[self.current_id])
 
         elif status is Failure:
-            self.current_id += 1
-            if self.current_id == len(self.children)-1:
+            if self.current_id + 1 == len(self.children):
                 status = Failure
             else:
+                self.current_id += 1
                 status = Running
 
         if self.parent is not None:

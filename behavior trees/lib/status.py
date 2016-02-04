@@ -1,5 +1,6 @@
 class Status:
     value = None
+
     def __init__(self, value):
         self.value = value
 
@@ -19,9 +20,8 @@ class Status:
         elif self.value is True:
             return '(success)'
 
-
 Success = Status(True)
 Running = Status(None)
 Failure = Status(False)
 
-__all__ = ['Success','Failure','Running']
+__all__ = ['Success', 'Failure', 'Running']

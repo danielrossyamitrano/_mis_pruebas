@@ -1,4 +1,6 @@
 from .status import Running
+from types import MethodType
+
 
 class Node:
     idx = None
@@ -18,13 +20,17 @@ class Leaf(Node):
     process = None
     tick = 0
 
-    def __init__(self, tree, idx, data):
+    def __init__(self, tree, idx, data, process_name):
         # leaves are incapable of having any children
         super().__init__(tree, idx)
         self.data = data
+        self.process_name = process_name
+
+    def set_process(self, process):
+        self.process = MethodType(process, self)
 
     def __repr__(self):
-        return str(self.idx) + ' ' + self.type + ' '
+        return self.type + ' #' + str(self.idx) + ' (' + self.process_name + ')'
 
     def update(self):
         self.tick += 1
