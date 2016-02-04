@@ -17,16 +17,31 @@ class Decorator(Node):
         
 class Repeater(Decorator):
     name = 'Repeater'
-    current_round = 0
+    current_time = -1
 
-    def __init__(self, tree, idx, child, times=0):
+    def __init__(self, tree, idx, child, times=None):
         super().__init__(tree, idx, child)
+        if times is not None and times > 0:
+            self.amount_of_times = times
+        else:
+            self.amount_of_times = None
 
     def __repr__(self):
         return self.type + ' #' + str(self.idx) + ' ' + self.name
         
     def get_child_status(self, status):
-        pass
+        if self.amount_of_times is None:
+            self.tree.set_to_check(self.child)
+
+        elif self.current_time <= self.amount_of_times:
+            self.tree.set_to_check(self.child)
+
+        else:
+            self.parent.get_child_status(status)
+
+    def update(self):
+        self.current_time += 1
+        super().update()
 
         
 class UntilFail(Decorator):

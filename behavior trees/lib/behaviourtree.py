@@ -28,7 +28,7 @@ class BehaviourTree:
             elif 'child' in data:  # decorator
                 self.tree_structure[idx].append(int(data['child']))
                 if data['script'] == 'Repeater':
-                    node = Repeater(self, idx, data['child'])
+                    node = Repeater(self, idx, data['child'], data.get('context', 0))
                 elif data['script'] == 'UntilFail':
                     node = UntilFail(self, idx, data['child'])
                 elif data['script'] == 'Succeeder':
@@ -37,7 +37,7 @@ class BehaviourTree:
                     node = Inverter(self, idx, data['child'])
 
             else:  # leaf
-                node = Leaf(self, idx, data['context'],data['script'])
+                node = Leaf(self, idx, data['context'], data['script'])
                 process = None
                 if data['script'] in globals():
                     process = globals()[data['script']]
