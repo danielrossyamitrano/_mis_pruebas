@@ -1,0 +1,24 @@
+{
+    "0": {"type":"Secuence","children":[1,2,3]},
+    "1": {"type":"Leaf","script":"_getstackfrom", "context":["door","building"]},
+    "2": {"type":"Decorator","script":"UntilFail","child":4},
+    "3": {"type":"Decorator","script":"Inverter", "child":5},
+    
+    "4": {"type":"Secuence","children":[6,7]},
+    "5": {"type":"Leaf","script":"_isnull", "context":["usedDoor"]},
+    "6": {"type":"Leaf","script":"_popfromstack", "context":["door"]},
+    "7": {"type":"Decorator","script":"Inverter", "child":8},
+    
+    "8": {"type":"Secuence","children":[9,10,11,12,13]},
+    "9": {"type":"Leaf","script":"_walk", "context":["door"]},
+    
+    "10":{"type":"Selector","children":[14,15,16]},
+    "11":{"type":"Leaf","script":"_walk", "context":["door"]},
+    "12":{"type":"Decorator","script":"Succeeder","child":17},
+    "13":{"type":"Leaf","script":"_setvariable", "context":["door","usedDoor"]},
+    
+    "14":{"type":"Leaf","script":"_open", "context":["door"]},
+    "15":{"type":"Leaf","script":"_unlock", "context":["door"]},
+    "16":{"type":"Leaf","script":"_smash", "context":["door"]},
+    "17":{"type":"Leaf","script":"_close", "context":["door"]}
+}
