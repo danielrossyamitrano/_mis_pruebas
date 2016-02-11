@@ -26,9 +26,6 @@ class Leaf(Node):
         self.data = data
         self.process_name = process_name
 
-    def set_process(self, process):
-        self.process = MethodType(process, self)
-
     def __repr__(self):
         return self.type + ' #' + str(self.idx) + ' (' + self.process_name + ')'
 

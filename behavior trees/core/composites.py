@@ -31,15 +31,13 @@ class Secuence(Composite):
         return ' '.join([self.type, '#' + str(self.idx), self.name, '(' + ', '.join(lista) + ')'])
 
     def get_child_status(self, status):
-        if status is Running:
-            self.tree.set_to_check(self.children[self.current_id])
-
-        elif status is Success:
-            if self.current_id + 1 == len(self.children):
-                status = Success
-            else:
+        if status is Success:
+            if not self.current_id + 1 == len(self.children):
                 self.current_id += 1
                 status = Running
+                
+        if status is Running:
+            self.tree.set_to_check(self.children[self.current_id])
 
         if self.parent is not None:
             self.parent.get_child_status(status)
@@ -56,15 +54,13 @@ class Selector(Composite):
         return ' '.join([self.type, '#' + str(self.idx), self.name, '(' + ', '.join(lista) + ')'])
 
     def get_child_status(self, status):
-        if status is Running:
-            self.tree.set_to_check(self.children[self.current_id])
-
-        elif status is Failure:
-            if self.current_id + 1 == len(self.children):
-                status = Failure
-            else:
+        if status is Failure:
+            if not self.current_id + 1 == len(self.children):
                 self.current_id += 1
                 status = Running
+        
+        if status is Running:
+            self.tree.set_to_check(self.children[self.current_id])
 
         if self.parent is not None:
             self.parent.get_child_status(status)

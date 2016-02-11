@@ -1,5 +1,5 @@
 from data import scripts
-from lib import BehaviourTree
+from core import BehaviourTree
 import json
 
 
@@ -10,7 +10,7 @@ def abrir_json(archivo):
     return data
 
 
-file = abrir_json('data/example_2.json')
+file = abrir_json('data/example_1.json')
 
 b = BehaviourTree(file, scripts)
 

@@ -2,6 +2,7 @@ from collections import OrderedDict
 from .composites import *
 from .decorators import *
 from .node import Leaf
+from types import FunctionType, MethodType
 
 
 class BehaviourTree:
@@ -37,14 +38,19 @@ class BehaviourTree:
                     node = Inverter(self, idx, data['child'])
 
             else:  # leaf
-                node = Leaf(self, idx, data['context'], data['script'])
                 process = None
                 if data['script'] in globals():
                     process = globals()[data['script']]
+                    
                 elif hasattr(scripts, data['script']):
                     process = getattr(scripts, data['script'])
-
-                node.set_process(process)
+                
+                if isinstance(process, FunctionType):
+                    node = Leaf(self, idx, data['context'],data['script'])
+                    node.process = MethodType(process, node)
+                    
+                elif issubclass(process,Leaf):
+                    node = process(self, idx, data['context'],data['script'])
 
             self.nodes.append(node)
 

@@ -6,12 +6,12 @@
     "3":{"type":"Selector","children":[6,7,8]},
     "4":{"type":"Leaf","script":"_walk", "context":["door"]},
     "5":{"type":"Leaf","script":"_close", "context":["door"]},
-    "6":{"type":"Leaf","script":"_open", "context":["door"]},
+    "6":{"type":"Leaf","script":"_open1", "context":["door"]},
     
     "7":{"type":"Secuence","children":[9,10]},
     "8":{"type":"Leaf","script":"_smash", "context":["door"]},
     "9":{"type":"Leaf","script":"_unlock", "context":["door"]},
-    "10":{"type":"Leaf","script":"_open", "context":["door"]},
+    "10":{"type":"Leaf","script":"_open2", "context":["door"]},
     
     "11":{"type":"Secuence","children":[12,13,14,15]},
     "12":{"type":"Leaf","script":"_walk", "context":["window"]},
@@ -19,10 +19,10 @@
     "13":{"type":"Selector","children":[16,17,18]},
     "14":{"type":"Leaf","script":"_walk", "context":["window"]},
     "15":{"type":"Leaf","script":"_close", "context":["window"]},
-    "16":{"type":"Leaf","script":"_open", "context":["window"]},
+    "16":{"type":"Leaf","script":"_open1", "context":["window"]},
     
     "17":{"type":"Secuence","children":[19,20]},
     "18":{"type":"Leaf","script":"_smash", "context":["window"]},
     "19":{"type":"Leaf","script":"_unlock", "context":["window"]},
-    "20":{"type":"Leaf","script":"_open", "context":["window"]}
+    "20":{"type":"Leaf","script":"_open2", "context":["window"]}
 }
