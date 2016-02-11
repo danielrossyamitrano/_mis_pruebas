@@ -1,0 +1,3 @@
+El contenido de ésta librería y sus ejemplos 1 y 2 (data/example_1.json y data/example_2.json) son implementaciones de lo escrito por Chris Simpson en Gamasutra.com el 07/17/14. La información fue extraída de:
+
+http://www.gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php
