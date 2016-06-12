@@ -1,15 +1,3 @@
 __pycache__
 /.idea
-/behavior trees/core/__init__.py
-/behavior trees/core/behaviourtree.py
-/behavior trees/core/composites.py
-/behavior trees/core/decorators.py
-/behavior trees/core/node.py
-/behavior trees/core/randomcomposites.py
-/behavior trees/core/status.py
-/behavior trees/data/__init__.py
-/behavior trees/data/example_1.json
-/behavior trees/data/example_2.json
-/behavior trees/data/scripts.py
-/behavior trees/main.py
-/behavior trees/notice.txt
+/behavior trees
