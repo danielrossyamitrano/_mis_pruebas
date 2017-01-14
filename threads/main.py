@@ -22,15 +22,14 @@ class myThread(threading.Thread):
         while not exitFlag:
             queueLock.acquire()
             if not workQueue.empty():
-                data = workQueue.get()
+                data = self.q.get()
                 queueLock.release()
-                print (self.name+" processing "+data+'\n')
+                print (self.name+" processing "+data)
             else:
                 queueLock.release()
-            time.sleep(1)
 
 
-t = 3
+t = 1
 nameList = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
 queueLock = threading.Lock()
 workQueue = queue.Queue(10)
