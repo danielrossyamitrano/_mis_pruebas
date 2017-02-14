@@ -1,26 +1,26 @@
 from pygame import time
-from datetime import datetime
+from .clock import Clock
 
 fps = time.Clock()
-second_real = datetime.now().time().second
-second_fictional = 0
+clock = Clock(h=7, m=51, real=False)
 
-shows = ['fiction','real']
-show  = 1
+_frames = 0
+rate = 60
 
-while True:
-    fps.tick(60)
-    
-    mom = datetime.now().time()
-    h = mom.hour
-    m = mom.minute
-    tick = mom.second
-    
-    if second_real != tick:
-        second_real = tick
-        second_fictional += 1
-        
-    if shows[show] == 'fiction':
-        print(second_fictional)
-    elif shows[show] == 'real':
-        print(h,':',m,sep='')
+clock.enabled = True
+dia = 0
+
+while True:  # esto representa Tiempo.update()
+    fps.tick(rate)
+
+    _frames += 1
+    if _frames == rate:
+        clock.update()
+        _frames = 0
+
+        if clock.day_flag:
+            dia += 1
+        if clock.hour_flag:
+            print(clock.timestamp())
+        if clock.minute_flag:
+            print(clock.timestamp())
