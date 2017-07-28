@@ -1,6 +1,6 @@
 from pygame import display as pantalla, quit as pyquit
 from pygame import K_ESCAPE, draw, font, Rect, image, mouse, event
-from pygame import KEYDOWN, QUIT, K_LCTRL, K_LSHIFT, MOUSEBUTTONDOWN, KEYUP, K_RETURN
+from pygame import KEYDOWN, K_LCTRL, K_LSHIFT, MOUSEBUTTONDOWN, KEYUP, K_RETURN, NOFRAME
 from sys import exit
 import bisect
 import os
@@ -8,47 +8,48 @@ import os
 font.init()
 graph = image.load('graph.png')
 fuente = font.SysFont('verdana', 16)
-rect = Rect(67, 1, 601 - 72, 597 - 67)
 mass_keys = [(i + 1) / 10 for i in range(1, 9)] + [i * 1000 for i in range(1, 9)] + [
     i for i in range(1, 10)] + [i * 10 for i in range(1, 10)] + [i * 100 for i in range(1, 10)]
 mass_keys.sort()
 radius_keys = [i / 10 for i in range(2, 10, 2)] + [i for i in range(1, 20)]
+negro, gris, cian = (0, 0, 0), (125, 125, 125), (0, 125, 255)
 
-xx, a = 0, 0
+x, a = 0, 0
 exes = []
 for j in range(5):
-    for xx in [35, 55, 70, 81, 90, 98, 105, 110, 115]:
-        xx += a
+    for x in [33, 53, 68, 79, 88, 95, 102, 108, 114]:
+        x += a
         if j == 1:
-            xx += j
+            x += 1
         elif j == 2:
-            xx += 1
-        exes.append(xx)
-    a = xx
+            x += 2
+        elif j == 3:
+            x += 1
+        elif j == 4:
+            x += 2
+        exes.append(x)
+    a = x
 exes.sort()
 yes = [26, 48, 68, 85, 100, 200, 259, 300, 333, 359, 381, 400, 417, 433]
 
 
 def graph_loop():
+    w, h = 606, 606
     os.environ['SDL_VIDEO_CENTERED'] = "{!s},{!s}".format(0, 0)
-    fondo = pantalla.set_mode((601, 597))
-
+    pantalla.set_mode((w, h), NOFRAME)
+    rect = Rect(72, 3, w - 78, h - 74)
     move_x, move_y = True, True
     lockx, locky = False, False
     mass_value = 0
     radius_value = 0
     while True:
         for e in event.get():
-
-            if e.type == QUIT:
-                pyquit()
-                exit()
-            elif e.type == KEYDOWN:
+            if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
                     pyquit()
                     exit()
 
-                elif e.key == K_LSHIFT:
+                if e.key == K_LSHIFT:
                     move_x = False
 
                 elif e.key == K_LCTRL:
@@ -78,14 +79,14 @@ def graph_loop():
                         lockx, locky = False, False
                         move_x, move_y = True, True
 
-        x, y = mouse.get_pos()
+        mouse_x, mouse_y = mouse.get_pos()
         if move_x and not lockx:
-            line_x = x
+            line_x = mouse_x
         if move_y and not locky:
-            line_y = y
+            line_y = mouse_y
 
-        dx = x - rect.left
-        dy = abs(y - rect.bottom)
+        dx = mouse_x - rect.left
+        dy = abs(mouse_y - rect.bottom)
 
         if move_x:
             if dx in exes:
@@ -101,16 +102,25 @@ def graph_loop():
                 idy = bisect.bisect(yes, dy) - 1
             radius_value = dy * radius_keys[idy] / yes[idy]
 
-        mass_text = 'Mass:' + str(round(mass_value, 3))
-        radius_text = 'Radius:' + str(round(radius_value, 3))
-        render1 = fuente.render(mass_text, 1, (0, 0, 0), (255, 255, 255))
-        render2 = fuente.render(radius_text, 1, (0, 0, 0), (255, 255, 255))
+        pantalla.get_surface().fill(gris)
+        area = pantalla.get_surface().blit(graph, (3, 3))
+        if rect.collidepoint(line_x, line_y):
+            draw.line(pantalla.get_surface(), cian, (line_x, rect.top + 1), (line_x, rect.bottom), 2)
+            mass_text = 'Mass:' + str(round(mass_value, 3))
+        else:
+            mass_text = 'Mass:'
 
-        fondo.blit(graph, (0, 0))
+        if rect.collidepoint(rect.left, line_y):
+            draw.line(pantalla.get_surface(), cian, (rect.left, line_y), (rect.right, line_y), 2)
+            radius_text = 'Radius:' + str(round(radius_value, 3))
+        else:
+            radius_text = 'Radius:'
 
-        draw.line(fondo, (0, 125, 255), (line_x, rect.top), (line_x, rect.bottom), 2)
-        draw.line(fondo, (0, 125, 255), (rect.left, line_y), (rect.right, line_y), 2)
+        pantalla.get_surface().blit(fuente.render(mass_text, 1, negro), (area.left, area.bottom - 22))
+        pantalla.get_surface().blit(fuente.render(radius_text, 1, negro), (area.left + 153, area.bottom - 22))
 
-        fondo.blit(render1, (0, 579 - 10))
-        fondo.blit(render2, (150, 579 - 10))
         pantalla.flip()
+
+
+if __name__ == '__main__':
+    graph_loop()
