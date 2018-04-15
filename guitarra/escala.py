@@ -1,7 +1,9 @@
 class Escala:
-    _notas = ['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si']
+    _notas = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si']
     notas = []
-    def __init__(self, tonica):
+
+    def __init__(self, tonica, modo='M'):
+
         if tonica in self._notas:
             idx = self._notas.index(tonica)
             self.tonica = tonica
@@ -12,8 +14,22 @@ class Escala:
 
         else:
             raise TypeError('La nota indicada es inválida')
-        
-        self.notas = self._notas[idx:]+self._notas[:idx]+[self.tonica]
+
+        self.notas = self._notas[idx:] + self._notas[:idx] + [self.tonica]
+
+        self.grados_conjuntos = []
+        mayor = {1: 0, 2: 2, 3: 4, 4: 5, 5: 7, 6: 9, 7: 11, 8: 12}
+        menor = {1: 0, 2: 2, 3: 3, 4: 5, 5: 7, 6: 8, 7: 10, 8: 12}
+        for grado in range(1, 9):
+            if modo == 'M' or modo == 'Mayor':
+                self.modo = 'Mayor'
+                idx = mayor[grado]
+
+            elif modo == 'm' or modo == 'menor':
+                self.modo = 'menor'
+                idx = menor[grado]
+
+            self.grados_conjuntos.append(self.notas[idx])
 
     def __getitem__(self, key):
         if type(key) is int:
@@ -23,28 +39,33 @@ class Escala:
             return idx
 
     def __repr__(self):
-        return self.tonica
+        return 'Escala ' + self.modo + ' de ' + self.tonica
+
+    def __call__(self):
+        return self.grados_conjuntos
+
 
 class Acorde:
-    mayor = {1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12}
-    menor = {1:0,2:2,3:3,4:5,5:7,6:8,7:10,8:12}
-    tonos = {'Mayor':mayor,'Menor':menor,'M':mayor,'m':menor}
-    
+    mayor = {1: 0, 2: 2, 3: 4, 4: 5, 5: 7, 6: 9, 7: 11, 8: 12}
+    menor = {1: 0, 2: 2, 3: 3, 4: 5, 5: 7, 6: 8, 7: 10, 8: 12}
+    tonos = {'Mayor': mayor, 'Menor': menor, 'M': mayor, 'm': menor}
+
     def __init__(self, escala, modo='Mayor', septima=False):
         self.notas = []
-        notas = [1,3,5]
-        if septima: 
+        notas = [1, 3, 5]
+        if septima:
             notas.append(7)
-            
+
         for n in notas:
             self.notas.append(escala[self.tonos[modo][n]])
-    
+
     def __repr__(self):
         return ','.join(self.notas)
 
+
 def descifrar(codigo):
-    cifrado = {'A':'La','B':'Si','C':'Do','D':'Re','E':'Mi','F':'Fa','G':'Sol'}
-    args = [cifrado[codigo[0]],'Mayor']
+    cifrado = {'A': 'La', 'B': 'Si', 'C': 'Do', 'D': 'Re', 'E': 'Mi', 'F': 'Fa', 'G': 'Sol'}
+    args = [cifrado[codigo[0]], 'Mayor']
     if '#' in codigo:
         args[0] += '#'
     if 'm' in codigo:
@@ -54,19 +75,18 @@ def descifrar(codigo):
 
     return args
 
-def cifrar(nota,modo,septima):
-    cifrado = {'La':'A','Si':'B','Do':'C','Re':'D','Mi':'E','Fa':'F','Sol':'G'}
-    codigo = ''
-    
+
+def cifrar(nota, modo, septima):
+    cifrado = {'La': 'A', 'Si': 'B', 'Do': 'C', 'Re': 'D', 'Mi': 'E', 'Fa': 'F', 'Sol': 'G'}
+
     if '#' in nota:
         codigo = cifrado[nota[:-1]] + "#"
     else:
         codigo = cifrado[nota]
-        
+
     if modo == 'Menor' or modo == 'm':
         codigo += 'm'
     if septima:
         codigo += '7'
 
     return codigo
-
