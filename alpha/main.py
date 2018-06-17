@@ -1,7 +1,7 @@
 from pygame import image, init as py_init, quit as py_quit
 from pygame import display as pantalla
-from pygame import PixelArray, mask
-from pygame import event, QUIT, KEYDOWN
+from pygame import PixelArray, mask, Surface
+from pygame import event, QUIT, KEYDOWN, SRCALPHA
 import sys
 
 def extract_mask(img):
@@ -23,9 +23,16 @@ def extract_mask(img):
     return render,alpha
 
 py_init()
-fondo = pantalla.set_mode((50,50))
+fondo = pantalla.set_mode((75,50))
 img =  image.load('crate.png').convert_alpha()
 render,mascara = extract_mask(img)
+
+w,h = mascara.get_size()
+layer = Surface((w,h),SRCALPHA)
+for y in range(h):
+    for x in range(w):
+        if mascara.get_at((x,y)):
+            layer.fill((255,0,255,125),(x,y,1,1))
 
 while True:
     fondo.fill((0,255,125))
@@ -35,4 +42,6 @@ while True:
             sys.exit()
     fondo.blit(render,(5,10))
     fondo.blit(img,(30,10))
+    fondo.blit(render, (55,10))
+    fondo.blit(layer,(55,10))
     pantalla.flip()
