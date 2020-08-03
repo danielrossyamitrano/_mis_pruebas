@@ -1,4 +1,3 @@
-from pygame import *
 import pygame
 
 pygame.init()
@@ -13,7 +12,7 @@ shadow2 = shadow.copy()
 # a helper surface we use later for the fixed shadows
 shadow_surf = pygame.Surface((800, 600))
 # we set a colorkey to easily make this surface transparent
-colorkey_color = (2,3,4)
+colorkey_color = (2, 3, 4)
 shadow_surf.set_colorkey(colorkey_color)
 # the alpha value of our shadow
 shadow_surf.set_alpha(100)
@@ -41,9 +40,9 @@ while running:
     # will be fully black, but the alpha value for the full Surface image
     # is set to 100, so we still have transparent shadows
     shadow_surf.fill(colorkey_color)
-    shadow_surf.blit(shadow, (100, 100))
-    shadow_surf.blit(shadow2, (164, 164))
+    shadow_surf.blit(shadow, (500, 100))
+    shadow_surf.blit(shadow2, (564, 164))
 
-    screen.blit(shadow_surf, (400, 0))
+    screen.blit(shadow_surf, (0, 0))
 
     pygame.display.update()
