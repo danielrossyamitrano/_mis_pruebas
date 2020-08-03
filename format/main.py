@@ -1,4 +1,12 @@
-﻿txt = open('text.txt', 'r', encoding='utf-8').read()
+﻿from os import path
+if not path.exists('text.txt'):
+    file = open('text.txt', 'w', encoding='utf-8')
+    file.close()
+    raise IOError('No data to format, edit the file and rerun.')
+else:
+    file = open('text.txt', 'r', encoding='utf-8')
+
+txt = file.read()
 output = open('format.txt', 'wt', encoding='utf-8')
 
 tag_in = '[COLOR=rgb(183, 28, 28)]'
