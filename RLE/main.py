@@ -1,14 +1,15 @@
-from pygame import PixelArray, mask, Surface, init, quit, display, event as events, QUIT
+from pygame import PixelArray, mask, Surface, init, quit, display, event as events, QUIT, image
 from sys import exit
+import re
 
 
 def get_hex_palette(surface):
     _tmpSurf = surface.copy()
     pxarray = PixelArray(_tmpSurf)
-    w, h = pxarray.shape
+    width, height = pxarray.shape
     colores = []
-    for x in range(w):
-        for y in range(h):
+    for x in range(width):
+        for y in range(height):
             rgba = _tmpSurf.unmap_rgb(pxarray[x, y])
             hex_color = '{0:0=2X}{1:0=2X}{2:0=2X}{3:0=2X}'.format(*rgba)
             if hex_color not in colores:
@@ -19,10 +20,10 @@ def get_hex_palette(surface):
 
 def serialize(surface):
     mascara = mask.from_threshold(surface, (255, 0, 255), (1, 1, 1, 255))
-    w, h = mascara.get_size()
+    width, height = mascara.get_size()
     serial_code = ''
-    for y in range(h):
-        for x in range(w):
+    for y in range(height):
+        for x in range(width):
             serial_code += str(mascara.get_at([x, y]))
 
     return serial_code
@@ -50,6 +51,7 @@ def encode(input_string):
 def decode(code):
     q = ""
     num = ''
+    char = ''
     for character in code:
         if character.isalpha():
             if num != '':
@@ -73,8 +75,9 @@ def deserialize(serial_code, w, h):
     for y in range(h):
         for x in range(w):
             idx += 1
-            if serial_code[idx] == '1':
-                img[x, y] = 255, 0, 255
+            if 0 <= idx < len(serial_code):
+                if serial_code[idx] == '1':
+                    img[x, y] = 255, 0, 255
 
             else:
                 img[x, y] = 0, 0, 0
@@ -89,18 +92,33 @@ def comprimir(code):
         s += e[e.find(s[-1], e.find(s)) + 1]
 
     comp = e.replace(s, 'J')
-    Js = comp.count('J')
-    split = comp.split('J' * Js)
+    jotas = comp.count('J')
+    split = comp.split('J' * jotas)
 
-    comp = ('J' + str(Js)).join(split) + ':' + s
+    comp = ('J' + str(jotas)).join(split) + ':' + s
     return comp
 
 
 def descomprimir(comp):
+    assert analize_code(comp), f'Code "{comp}" is invalid'
     key, val = comp.split(':')
-    n = int(key[key.find('J') + 1])
-    missing = val * int(n)
-    return missing.join(key.split('J' + str(n)))
+    j = key.find('J')
+    if not j == -1:
+        n = int(key[key.find('J') + 1])
+        missing = val * int(n)
+        return missing.join(key.split('J' + str(n)))
+    else:
+        return key
+
+
+def analize_code(serial_code: str):
+    code = re.compile(r'[A-B]\d+[J]\d+[A-B]\d+[A-B]\d+:[A-B]\d+[A-B]\d+')
+
+    valid = re.fullmatch(code, serial_code) is not None
+    valid = serial_code.count('AA') <= 1 and valid
+    valid = serial_code.count('BB') <= 1 and valid
+    valid = serial_code.count('JJ') <= 1 and valid
+    return valid
 
 
 init()
@@ -111,15 +129,17 @@ surf.fill((255, 0, 255), (22, 61, 10, 16))
 serial = serialize(surf)
 encoded = encode(serial)
 compressed = comprimir(encoded)
-decompressed = descomprimir("B333AAAA:")
+decompressed = descomprimir(compressed)
 decoded = decode(decompressed)
-image = deserialize(decoded, 53, 71)  # hay que suministrar las medidas de la imagen original
+imagen = deserialize(decoded, 53, 71)  # hay que suministrar las medidas de la imagen original
+
+get_hex_palette(image.load('arbol_escalado.png'))
 
 fondo = display.set_mode((200, 200))
 while True:
     fondo.fill((255, 255, 255))
 
-    fondo.blit(image, (10, 10))
+    fondo.blit(imagen, (10, 10))
     fondo.blit(surf, (90, 10))
     display.update()
     for event in events.get():
