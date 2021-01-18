@@ -1,6 +1,6 @@
-from pygame import init, quit, display, event, Surface
-from pygame import KEYDOWN, QUIT, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT, SRCALPHA, BLEND_RGBA_MIN, K_KP_PLUS, \
-    K_KP_MINUS
+from pygame import init, quit, display, event, Surface, Rect
+from pygame import KEYDOWN, QUIT, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT
+from pygame import SRCALPHA, BLEND_RGBA_MIN, K_KP_PLUS, K_KP_MINUS
 from pygame.sprite import Sprite, LayeredUpdates
 from sys import exit
 
@@ -10,6 +10,8 @@ fondo = display.set_mode((600, 400))
 
 
 class MyGroup(LayeredUpdates):
+    _init_rect = Rect(0, 0, 0, 0)
+
     def draw(self, surface):
         """draw all sprites in the right order onto the passed surface
 
@@ -24,6 +26,7 @@ class MyGroup(LayeredUpdates):
         init_rect = self._init_rect
         for spr in self.sprites():
             rec = spritedict[spr]
+            # noinspection PyUnresolvedReferences
             if spr.tipo == 'Sombra':
                 newrect = surface_blit(spr.image, spr.rect, special_flags=BLEND_RGBA_MIN)
             else:
