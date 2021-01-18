@@ -40,9 +40,8 @@ img.blit(render, (rect.w - rc.w, rect.h - rc.h))
 x, y = 0, 0
 
 d = 90
-angle = 0
 while True:
-    # fondo.fill(negro)
+    angle = 0
     for e in event.get():
         if e.type == KEYDOWN:
             if e.key == K_ESCAPE:
@@ -52,22 +51,9 @@ while True:
                 angle = d
             elif e.key == K_LEFT:
                 angle = -d
-                # idx += 1
-                # if idx > len(cw)-1:
-                # idx = 0
-                # rosa = fuente.render(cw[idx],1,negro,blanco)
-                # if cw[idx] == 'north':
-                # y,x = top,left
-                # elif cw[idx] == 'west':
-                # y,x = bottom,left
-                # elif cw[idx] == 'south':
-                # y,x = bottom,right
-                # elif cw[idx] == 'east':
-                # y,x = top,right
 
-                # rrect = rosa.get_rect(center = (50,50))
-            img = transform.rotate(img, angle)
-            # img.blit(rosa,rrect)
+            if angle:
+                img = transform.rotate(img, angle)
 
     fondo.blit(img, (25, 25))
     pantalla.flip()
