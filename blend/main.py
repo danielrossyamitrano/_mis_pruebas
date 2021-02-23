@@ -1,13 +1,17 @@
-from pygame import init, quit, display, event, Surface
-from pygame import KEYDOWN, QUIT, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT, SRCALPHA, BLEND_RGBA_MIN, K_KP_PLUS, K_KP_MINUS
+from pygame import init, quit, display, event, Surface, Rect
+from pygame import KEYDOWN, QUIT, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT
+from pygame import SRCALPHA, BLEND_RGBA_MIN, K_KP_PLUS, K_KP_MINUS
 from pygame.sprite import Sprite, LayeredUpdates
 from sys import exit
 
 init()
 
-fondo = display.set_mode((600,400))
+fondo = display.set_mode((600, 400))
+
 
 class MyGroup(LayeredUpdates):
+    _init_rect = Rect(0, 0, 0, 0)
+
     def draw(self, surface):
         """draw all sprites in the right order onto the passed surface
 
@@ -22,6 +26,7 @@ class MyGroup(LayeredUpdates):
         init_rect = self._init_rect
         for spr in self.sprites():
             rec = spritedict[spr]
+            # noinspection PyUnresolvedReferences
             if spr.tipo == 'Sombra':
                 newrect = surface_blit(spr.image, spr.rect, special_flags=BLEND_RGBA_MIN)
             else:
@@ -37,51 +42,51 @@ class MyGroup(LayeredUpdates):
             spritedict[spr] = newrect
         return dirty
 
+
 group = MyGroup()
 
-spr = Sprite()
-spr.image = Surface((32,32),SRCALPHA)
-spr.image.fill((125,125,125,125))
-spr.tipo = 'Sombra'
-spr.rect = spr.image.get_rect()
+spra = Sprite()
+spra.image = Surface((32, 32), SRCALPHA)
+spra.image.fill((125, 125, 125, 125))
+spra.tipo = 'Sombra'
+spra.rect = spra.image.get_rect()
 
 sprb = Sprite()
-sprb.image = Surface((32,32),SRCALPHA)
-sprb.image.fill((125,125,125,125))
+sprb.image = Surface((32, 32), SRCALPHA)
+sprb.image.fill((125, 125, 125, 125))
 sprb.tipo = 'Sombra'
-sprb.rect = spr.image.get_rect(topleft=(50,50))
+sprb.rect = spra.image.get_rect(topleft=(50, 50))
 
 char = Sprite()
-char.image = Surface((32,32),SRCALPHA)
-char.image.fill((255,0,0,255),(1,1,30,30))
+char.image = Surface((32, 32), SRCALPHA)
+char.image.fill((255, 0, 0, 255), (1, 1, 30, 30))
 char.tipo = 'Mob'
-char.rect = spr.image.get_rect(topleft=(150,50))
+char.rect = spra.image.get_rect(topleft=(150, 50))
 
-
-group.add(spr,sprb, char)
+group.add(spra, sprb, char)
 layer = 0
 while True:
-    fondo.fill((0,255,125))
+    fondo.fill((0, 255, 125))
     events = event.get([KEYDOWN, QUIT, K_ESCAPE])
     for e in events:
-        if e.type == QUIT or (e.type==KEYDOWN and e.key==K_ESCAPE):
+        if e.type == QUIT or (e.type == KEYDOWN and e.key == K_ESCAPE):
             quit()
             exit()
         elif e.type == KEYDOWN:
             if e.key == K_DOWN:
-                spr.rect.y += 3
+                spra.rect.y += 3
             if e.key == K_UP:
-                spr.rect.y -= 3
+                spra.rect.y -= 3
             if e.key == K_LEFT:
-                spr.rect.x -= 3
+                spra.rect.x -= 3
             if e.key == K_RIGHT:
-                spr.rect.x += 3
+                spra.rect.x += 3
             if e.key == K_KP_PLUS:
                 layer += 1
-                group.change_layer(spr, layer)
+                group.change_layer(spra, layer)
             if e.key == K_KP_MINUS:
                 layer -= 1
-                group.change_layer(spr, layer)
+                group.change_layer(spra, layer)
 
     group.draw(fondo)
     display.flip()
