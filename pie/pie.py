@@ -1,52 +1,53 @@
-from pygame import display, draw, event, QUIT, quit
-from pygame import KEYDOWN, K_LEFT, K_RIGHT, K_ESCAPE
-# from random import randint
-import math
+from pygame import display, event, QUIT, quit, draw
+from pygame.sprite import Sprite, LayeredUpdates
+from pygame import KEYDOWN, K_ESCAPE, SRCALPHA
+from pygame import Surface
+from math import sin, cos, pi
 from sys import exit
 
 # adapted from https://stackoverflow.com/questions/23246185/python-draw-pie-shapes-with-colour-filled
 
-screen = display.set_mode((160, 160))
-screen.fill((125, 125, 125))
-screen_rect = screen.get_rect()
-
+pantalla = display.set_mode((320, 240))
+screen_rect = pantalla.get_rect()
 values = [
-    [60, [255, 0, 0]],
-    [36, [0, 255, 0]],
-    [4, [0, 0, 255]]
+    [60, [255, 0, 0, 255]],
+    [36, [0, 255, 0, 255]],
+    [4, [0, 0, 255, 255]]
 ]
 
 
-def pie_chart():
-    radius = (screen_rect.width//2)-3
-    u = 0
-    arc = 0
-    for i in range(len(values)):
-        p = [screen_rect.center]
-        val, color = values[i]
-        arc += round((val/100)*360)
-
-        for n in range(u, arc+1):
-            x = screen_rect.centerx + int(radius * math.cos(n * math.pi / 180))
-            y = screen_rect.centery + int(radius * math.sin(n * math.pi / 180))
+class Arc(Sprite):
+    def __init__(self, clr, a, b, cx, cy, r):
+        super().__init__()
+        self.image = Surface((r*2, r*2), SRCALPHA)
+        self.rect = self.image.get_rect()
+        p = [[self.rect.centerx, self.rect.centery]]
+        for n in range(a, b):
+            x = self.rect.centerx + int(r * cos(n * pi / 180))
+            y = self.rect.centery + int(r * sin(n * pi / 180))
             p.append((x, y))
-        u = arc
-        draw.polygon(screen, color, p)
+
+        draw.polygon(self.image, clr, p)
+        self.rect.center = (cx, cy)
 
 
-rotation = 0
-pie_chart()
+chart = LayeredUpdates()
+arco = 0
+u = 0
+for value, color in values:
+    arco += round((value / 100) * 360)
+    arc = Arc(color, u, arco, *screen_rect.center, 74)
+    chart.add(arc)
+    u = arco
+
+
 while True:
     events = event.get([KEYDOWN, QUIT])
     for e in events:
         if (e.type == QUIT) or (e.type == KEYDOWN and e.key == K_ESCAPE):
             quit()
             exit()
-        elif e.type == KEYDOWN:
-            if e.key == K_LEFT:
-                rotation -= 1
 
-            elif e.key == K_RIGHT:
-                rotation += 1
-
+    pantalla.fill((125, 125, 125, 255))
+    chart.draw(pantalla)
     display.update()
