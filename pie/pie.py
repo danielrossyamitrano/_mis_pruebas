@@ -1,8 +1,9 @@
 from pygame import KEYDOWN, K_ESCAPE, SRCALPHA, MOUSEMOTION, MOUSEBUTTONDOWN, MOUSEBUTTONUP
-from pygame import display, event, QUIT, quit, draw
+from pygame import display, event, QUIT, quit, draw, mouse
 from pygame.sprite import Sprite, LayeredUpdates
+from math import sin, cos, pi, radians
 from pygame import Surface, transform
-from math import sin, cos, pi
+from random import randint
 from sys import exit
 
 # adapted from https://stackoverflow.com/questions/23246185/python-draw-pie-shapes-with-colour-filled
@@ -29,16 +30,31 @@ class BaseWidget(Sprite):
     def on_mousemotion(self, event):
         pass
 
+    def on_mouseover(self):
+        pass
+
 
 class Handle(BaseWidget):
     pressed = False
+    selected = False
 
-    def __init__(self, parent, x, y):
+    def __init__(self, parent, angle, x, y):
         super().__init__(parent)
-        image = Surface((8, 8), SRCALPHA)
-        image.fill((0, 0, 0))
-        self.image = transform.rotate(image, 45.0)
+        self.angle = angle
+        self.linked = []
+        self.img_uns = self.create((0, 0, 0), 6)
+        self.img_sel = self.create((255, 255, 255), 8)
+        self.image = self.img_uns
         self.rect = self.image.get_rect(center=(x, y))
+
+    @staticmethod
+    def create(color, size):
+        image = Surface((size, size), SRCALPHA)
+        image.fill(color)
+        return transform.rotate(image, 45.0)
+
+    def on_mouseover(self):
+        self.selected = True
 
     def on_mousebuttondown(self, event):
         if event.button == 1:
@@ -50,11 +66,51 @@ class Handle(BaseWidget):
 
     def on_mousemotion(self, event):
         dx, dy = event.rel
-        self.rect.move_ip(dx, dy)
-        self.parent.adjust()
+        if self.pressed:
+            if 0 <= self.angle <= 90:  # bottomright
+                if dx < 0 or dy > 0:
+                    self.angle += 1
+                else:
+                    self.angle -= 1
+            elif 90 <= self.angle <= 180:  # bottomleft
+                if dx < 0 or dy < 0:
+                    self.angle += 1
+                else:
+                    self.angle -= 1
+            elif 180 <= self.angle <= 270:  # topleft
+                if dx > 0 or dy < 0:
+                    self.angle += 1
+                else:
+                    self.angle -= 1
+            elif 270 <= self.angle <= 360:  # topright
+                if dx > 0 or dy > 0:
+                    self.angle += 1
+                else:
+                    self.angle -= 1
+
+            if self.angle > 360:
+                self.angle = 0
+            if self.angle < 0:
+                self.angle = 360
+
+            self.rect.center = self.set_xy()
+            for widget in self.linked:
+                widget.adjust()
+
+    def set_xy(self):
+        x = round(self.parent.rect.centerx + self.parent.radius * cos(radians(self.angle)))
+        y = round(self.parent.rect.centery + self.parent.radius * sin(radians(self.angle)))
+        return x, y
 
     def update(self, *args, **kwargs) -> None:
-        pass
+        if self.selected:
+            self.image = self.img_sel
+            self.rect = self.image.get_rect(center=self.rect.center)
+        else:
+            self.image = self.img_uns
+            self.rect = self.image.get_rect(center=self.rect.center)
+
+        self.selected = False
 
     def __repr__(self):
         return 'Handler'
@@ -64,58 +120,62 @@ class Arc(BaseWidget):
     layer = 1
     pressed = False
 
-    def __init__(self, clr, a, b, cx, cy, r):
+    def __init__(self, val, a, b, cx, cy, r):
         super().__init__()
+        self.value = val
+        self.radius = r
         self.image = Surface((r * 2, r * 2), SRCALPHA)
         self.rect = self.image.get_rect()
-        self.color = clr
-        p = [(self.rect.centerx, self.rect.centery)]
-        for n in range(a, b+1):
-            x = self.rect.centerx + int(r * cos(n * pi / 180))
-            y = self.rect.centery + int(r * sin(n * pi / 180))
-            p.append((x, y))
+        self.color = (randint(0, 255), randint(0, 255), randint(0, 255))
+        self.create(a, b)
 
-        draw.polygon(self.image, clr, p)
+        x, y = self.point(a)
+        self.handle_left = Handle(self, a, x, y)
 
-        self.handle_left = Handle(self, p[1][0], p[1][1])
-        self.handle_right = Handle(self, p[-1][0], p[-1][1])
-
-        dx = cx-self.rect.centerx
-        dy = cy-self.rect.centery
+        dx = cx - self.rect.centerx
+        dy = cy - self.rect.centery
         self.displace(dx, dy)
+
+    def point(self, n):
+        x = self.rect.w//2 + int(self.radius * cos(n * pi / 180))
+        y = self.rect.h//2 + int(self.radius * sin(n * pi / 180))
+        return x, y
+
+    def create(self, a, b):
+        p = [(self.rect.centerx, self.rect.centery)]
+        for n in range(a, b + 1):
+            p.append(self.point(n))
+
+        draw.polygon(self.image, self.color, p)
 
     def displace(self, dx, dy):
         self.rect.move_ip(dx, dy)
-        self.handle_right.rect.move_ip(dx, dy)
         self.handle_left.rect.move_ip(dx, dy)
 
     def adjust(self):
-        pass
+        print(self)
 
     def update(self, *args, **kwargs) -> None:
         pass
 
     def __repr__(self):
-        return 'Arc'+str(self.color)
+        return 'Arc ' + str(self.value)
 
 
-values = [
-    [60, [255, 0, 0, 255]],
-    [36, [0, 255, 0, 255]],
-    [4, [0, 0, 255, 255]]
-]
+values = [60, 36, 4]
 
 chart = LayeredUpdates()
 arco = 0
 u = 0
-for value, color in values:
+for value in values:
     arco += round((value / 100) * 360)
-    arc = Arc(color, u, arco, *screen_rect.center, 74)
-    chart.add(arc, arc.handle_left, arc.handle_right)
+    arc = Arc(value, u, arco, *screen_rect.center, 74)
+    chart.add(arc, arc.handle_left)
     u = arco
 
 while True:
     events = event.get([KEYDOWN, QUIT, MOUSEMOTION, MOUSEBUTTONDOWN, MOUSEBUTTONUP])
+    px, py = mouse.get_pos()
     for e in events:
         if (e.type == QUIT) or (e.type == KEYDOWN and e.key == K_ESCAPE):
             quit()
@@ -127,14 +187,18 @@ while True:
                 widget.on_mousebuttondown(e)
 
         elif e.type == MOUSEBUTTONUP:
-            widgets = chart.get_sprites_at(e.pos)
+            widgets = chart.sprites()
             for widget in widgets:
                 widget.on_mousebuttonup(e)
 
         elif e.type == MOUSEMOTION:
-            for widget in chart.sprites():
+            for widget in chart.sprites():  # this action is non-standard
                 if widget.pressed:
                     widget.on_mousemotion(e)
+
+    for sprite in chart:
+        if sprite.rect.collidepoint(px, py):
+            sprite.on_mouseover()
 
     pantalla.fill((125, 125, 125, 255))
     chart.update()
