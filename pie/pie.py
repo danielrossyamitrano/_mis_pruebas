@@ -76,25 +76,21 @@ class Handle(BaseWidget):
                     delta = +1
                 else:
                     delta = -1
-                # print('caso 1', self.angle)
             elif 90 <= self.angle <= 180:  # bottomleft
                 if dx < 0 or dy < 0:
                     delta = +1
                 else:
                     delta = -1
-                # print('caso 2', self.angle)
             elif 180 <= self.angle <= 270:  # topleft
                 if dx > 0 or dy < 0:
                     delta = +1
                 else:
                     delta = -1
-                # print('caso 3', self.angle)
-            elif 270 <= self.angle < 360:  # topright
+            elif 270 <= self.angle <= 360:  # topright
                 if dx > 0 or dy > 0:
                     delta = +1
                 else:
                     delta = -1
-                # print('caso 4', self.angle)
 
             self.angle += delta
             if self.angle >= 360:
@@ -104,7 +100,7 @@ class Handle(BaseWidget):
 
             self.rect.center = self.set_xy()
             for widget in self.linked:
-                widget.adjust(self.angle, delta)
+                widget.adjust(self.angle - delta, delta)
 
     def link(self, arc):
         self.linked.append(arc)
@@ -124,6 +120,18 @@ class Handle(BaseWidget):
 
         self.selected = False
 
+    def merge(self, other):
+        """
+        Al unirse dos Handlers, estos deben mezclarse porque el arco que había entre ellos desapareció.
+
+        :type other: Handle
+        """
+        for arc in other.linked:
+            if arc not in self.linked:
+                self.link(arc)
+
+        other.kill()
+
     def __repr__(self):
         return self.color_name + ' Handler'
 
@@ -136,6 +144,7 @@ class Arc(BaseWidget):
     def __init__(self, val, color_idx, a, b, cx, cy, r):
         super().__init__()
         self.value = val
+        self.arco = b - a
         self.radius = r
         self.points = []
         self.color = Color(colors[color_idx])
@@ -166,9 +175,14 @@ class Arc(BaseWidget):
         p = [(rect.centerx, rect.centery)]
         for n in range(a, b + 1):
             p.append(self.point(n, rect))
+        try:
+            draw.polygon(image, self.color, p)
+            self.points = p
 
-        draw.polygon(image, self.color, p)
-        self.points = p
+        except ValueError:
+            # acá debería hacer merge()
+            self.handle.kill()
+
         return image
 
     def displace(self, dx, dy):
@@ -178,24 +192,23 @@ class Arc(BaseWidget):
     def adjust(self, angle, delta):
         a = self.a
         b = self.b
+        c = 360 + angle
+        d = 360 - angle
 
-        if a < angle < b:
-            a = angle
-            self.a = angle
-            # print(self, 'caso 1:', angle, a, b)
-        elif a < b < angle:
-            b = angle
-            self.b = angle
-            print(self, 'caso 2:', angle, a, b)
-        elif angle < a < b:
-            b += delta
+        if angle == a or a == c:
+            print('caso 1', self, 'a:', a, 'b:', b, 'c:', c, 'd:', d, 'angle:', angle)
+            self.a += delta
+        elif angle == b or b == c:
+            print('caso 2', self, 'a:', a, 'b:', b, 'c:', c, 'd:', d, 'angle:', angle)
+            self.b += delta
+        elif a == d:
+            print('caso 3', self, 'a:', a, 'b:', b, 'c:', c, 'd:', d, 'angle:', angle)
+            # self.b = self.a
+            # self.a = delta
+        else:
+            print('caso -', self, 'a:', a, 'b:', b, 'c:', c, 'd:', d, 'angle:', angle)
 
-            print(self, 'caso 3:', angle, a, b)
-
-        self.image = self.create(a, b)
-
-    def update(self, *args, **kwargs) -> None:
-        pass
+        self.image = self.create(self.a, self.b)
 
     def __repr__(self):
         return 'Arc ' + self.color_name
