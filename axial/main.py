@@ -1,78 +1,73 @@
-﻿from pygame import Surface, draw, image, font
-from math import cos, pi
+from pygame import draw, image, font, display, event, quit, init, Surface
+from pygame import KEYDOWN, K_UP, K_DOWN, QUIT, K_ESCAPE, K_SPACE, K_RETURN
+from fuciones import lines, set_xy
+from os import path, getcwd, remove
+from constantes import *
+from sys import exit
 
+init()
+ruta_a = path.join(getcwd(), 'tilted.png')
+ruta_b = path.join(getcwd(), 'latitudes.png')
+if path.exists(ruta_a):
+    remove(ruta_a)
+if path.exists(ruta_b):
+    remove(ruta_b)
+fondo = display.set_mode((1200, 600))
+frame = Surface(fondo.get_size())
+frame.fill(blanco)
 
-def axial_precession(year):
-    a1 = 19.87  # minimum axial tilt value
-    a2 = 34.05  # maximum axial tilt value
-    m = 20000  # period of the precession
+rect = fondo.get_rect()
 
-    # from: https://www.youtube.com/watch?v=a5aAIbTs_Gw
-    b = (a1 + a2) / 2
-    a = a2 - b
-    y = a * cos((2 * pi / m) * year - pi) + b
-    return y
-
-
-def interpolate(x, h):
-    p = [[0, h // 2], [90, h]]
-
-    x1 = p[0][0]
-    x2 = p[1][0]
-
-    y1 = p[0][1]
-    y2 = p[1][1]
-
-    diff_x = x2 - x1
-    a = (y2 - y1) / diff_x
-    b = y1 - a * x1
-
-    y = round(a * x + b)
-    return y
-
-
-blanco = 255, 255, 255
-negro = 0, 0, 0
-rojo = 255, 0, 0
-azul = 0, 0, 255
-verde = 0, 255, 0
-magenta = 255, 0, 255
-
-s = Surface((1200, 601))
-s.fill(blanco)
-
-font.init()
+fondo.fill(blanco)
 f = font.SysFont('Verdana', 16)
 
-ruta = 'D:/Python/p/axial/lines/'
+tilt = 0
+done = False
+lats = None
+while not done:
+    events = event.get([KEYDOWN, QUIT])
+    event.clear()
+    delta = 0
 
-for year in range(0, 20001, 250):
-    name = str(year).rjust(5, '0')
-    tilt = axial_precession(year)
+    for e in events:
+        if e.type == QUIT or (e.type == KEYDOWN and e.key == K_ESCAPE):
+            done = True
 
-    frame = s.copy()
-    rect = frame.get_rect()
+        elif e.type == KEYDOWN:
+            if e.key == K_UP:
+                delta = +1
+            elif e.key == K_DOWN:
+                delta = -1
+            elif e.key == K_RETURN or e.key == K_SPACE and lats is not None:
+                image.save(frame, ruta_a)
+                image.save(lats, ruta_b)
 
-    equator = rect.centery
-    draw.line(frame, verde, [0, equator], [rect.w, equator])
+    if tilt + delta < 0:
+        tilt = 180
+    elif tilt + delta > 180:
+        tilt = 0
 
-    south_tropic = interpolate(tilt, rect.h)
-    draw.line(frame, rojo, [0, south_tropic], [rect.w, south_tropic])
+    tilt += delta
 
-    north_tropic = rect.h - south_tropic
-    draw.line(frame, rojo, [0, north_tropic], [rect.w, north_tropic])
+    frame.fill(blanco)
+    draw.line(frame, negro, [100, rect.centery], [rect.w - 50, rect.centery], width=2)
+    draw.circle(frame, amarillo, [200, rect.centery], 50)
+    planet = draw.circle(frame, negro, [800, rect.centery], 200, width=2)
 
-    south_polar = interpolate(90 - tilt, rect.h)
-    draw.line(frame, azul, [0, south_polar], [rect.w, south_polar])
+    draw.line(frame, negro, [planet.centerx, 0], [planet.centerx, rect.h - 50])
+    x1, y1 = set_xy(planet.inflate(150, 150), tilt - 90)
+    x2, y2 = set_xy(planet.inflate(150, 150), tilt + 90)
+    draw.line(frame, negro, [x1, y1], [x2, y2], width=1)
 
-    north_polar = rect.h - south_polar
-    draw.line(frame, azul, [0, north_polar], [rect.w, north_polar])
-
-    render = f.render('año ' + str(year), True, negro, blanco)
-    frame.blit(render, (0, 0))
-
-    render_tilt = f.render('tilt: '+str(round(tilt, 2)), True, negro, blanco)
+    render_tilt = f.render('tilt: ' + str(round(tilt, 2)), True, negro)
     tilt_rect = render_tilt.get_rect(right=rect.w)
     frame.blit(render_tilt, tilt_rect)
 
-    image.save(frame, ruta + name + '.png')
+    lats = lines(tilt)
+    if done:
+        quit()
+        exit()
+    else:
+        fondo.fill(blanco)
+        fondo.blit(frame, (0, 0))
+        display.update()
