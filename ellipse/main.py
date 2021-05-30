@@ -1,138 +1,158 @@
-from pygame import display, event, QUIT, KEYDOWN, KEYUP, K_ESCAPE, init, quit, Surface, K_UP, K_DOWN, draw, font, K_SPACE, time
-from math import sin, cos, pi, sqrt,radians
+from pygame import QUIT, KEYDOWN, KEYUP, K_ESCAPE, K_UP, K_DOWN, K_SPACE, SCALED
+from pygame import display, event, init, quit, Surface, draw, font, time, Color
+from math import sin, cos, sqrt, radians, pow
+from os import environ
 from sys import exit
 
 init()
-fondo = display.set_mode((400,400))
-rect_fondo = fondo.get_rect()
+environ['SDL_VIDEO_CENTERED'] = "{!s},{!s}".format(0, 0)
+display.set_caption('Worldbuilding')
 fps = time.Clock()
 
-fuente1 = font.SysFont('Verdana',16)
-fuente2 = font.SysFont('Verdana',14)
+fuente1 = font.SysFont('Verdana', 16)
+fuente2 = font.SysFont('Verdana', 14)
+fuente3 = font.SysFont('Verdana', 12)
 
-negro = (0,0,0)
-blanco =(255,255,255)
+render_x = fuente1.render('x', 1, Color('black'))
+render_y = fuente1.render('y', 1, Color('black'))
+render_z = fuente1.render('z', 1, Color('black'))
 
-render_x = fuente1.render('x',1,negro)
-render_y = fuente1.render('y',1,negro)
-render_z = fuente1.render('z',1,negro)
+rect_x = render_x.get_rect(x=390, y=200)
+rect_top = render_y.get_rect(x=202, y=0)
+rect_mid = render_z.get_rect(x=190, y=rect_x.y)
 
-rect_x = render_x.get_rect(x=rect_fondo.right-10,y=rect_fondo.centerx)
-rect_top = render_y.get_rect(x=rect_fondo.centerx+2,y=0)
-rect_mid = render_z.get_rect(x=rect_fondo.centerx-10,y=rect_fondo.centery)
-
-text_a = 'Adjusting the Argument of periapsis'.center(45,' ')
+text_a = 'Adjusting the Argument of periapsis'.center(45, ' ')
 text_b = 'Adjusting the Longitude of the ascending node'
+text_c = 'Press [Space] to set the value and move on to the next.'
+text_d = 'Press [Space] to set the value and close.'
 
-render_text_a = fuente2.render(text_a,1,negro)
-render_text_b = fuente2.render(text_b,1,negro)
+render_text_a = fuente2.render(text_a, 1, Color('black'))
+render_text_b = fuente2.render(text_b, 1, Color('black'))
+instruction1 = fuente3.render(text_c, 1, Color('black'))
+instruction2 = fuente3.render(text_d, 1, Color('black'))
 
-rect_text=render_text_b.get_rect(centerx=rect_fondo.centerx,bottom=rect_fondo.bottom)
+rect_text = render_text_b.get_rect(centerx=200, bottom=440)
+rect_instruction = instruction1.get_rect(bottom=rect_text.top - 2)
 
-render_rotation = fuente2.render('Rotation: ',1,negro)
+render_rotation = fuente2.render('Rotation: ', 1, Color('black'))
 rect_rotation = render_rotation.get_rect()
 
+# mock orbit since these parameters are independent.
 a = 1
 e = 0.7
-b = (sqrt(1-pow(e,2)))
-c = sqrt(pow(a,2)-pow(b,2))
+b = (sqrt(1 - pow(e, 2)))
+c = sqrt(pow(a, 2) - pow(b, 2))
 
+# some adjustments for positioning
 delta = 100
-a*=delta
-b*=delta
-c*=delta
+a *= delta
+b *= delta
+c *= delta
 
-c1,c2 = 200, 200
+c1, c2 = 200, 200
 offset_x = c1
 offset_y = c2
-rotation = 270
-def draw_ellipse(rot_angle, size):
-    img = Surface(size)
-    img.fill(blanco)
-    rect = img.get_rect()
-    
-    draw.line(img,negro,rect.midleft,rect.midright,1)
-    draw.line(img,negro,rect.midtop,rect.midbottom,1)
-    colors = [(255,0,0), (0,255,0), (0,0,255)]
-    for angle in range(1, 361):
-        if angle <= 120:
-            color = colors[0]
-        elif 120 < angle <= 240:
-            color = colors[1]
-        else:
-            color = colors[2]
 
+
+def draw_ellipse(rot_angle):
+    img = Surface((400, 400))
+    img.fill(Color('white'))
+    rect = img.get_rect()
+
+    draw.line(img, Color('grey'), rect.midleft, rect.midright, 1)
+    draw.line(img, Color('grey'), rect.midtop, rect.midbottom, 1)
+
+    r = radians(rot_angle)
+    cos_r, sin_r = cos(r), sin(r)
+    cx = c * cos_r
+    cy = c * sin_r
+    for angle in range(0, 361):
         ang = radians(angle)
-        r = radians(rot_angle)
-        cos_r, sin_r = cos(r), sin(r)
         cos_a, sin_a = cos(ang), sin(ang)
-        
-        x1 = c * cos_r
-        y1 = c * sin_r
-        
-        x = offset_x + x1 + a * cos_a * cos_r - b * sin_a * sin_r
-        y = offset_y + y1 + b * sin_a * cos_r + a * cos_a * sin_r 
-        img.set_at((int(x),int(y)),color)
-    
-    draw.circle(img,negro,(c1, c2),3)
-    draw.circle(img,(0,255,255),(x1+c1, y1+c2),3)
-    draw.circle(img,(255,0,255),(c2+2*x1, c2+2*y1),3)
-    
+
+        #   offsets, foci,  ellipse,  rotation...
+        x = offset_x + cx + a * cos_a * cos_r - b * sin_a * sin_r
+        y = offset_y + cy + b * sin_a * cos_r + a * cos_a * sin_r
+        img.set_at((int(x), int(y)), Color('black'))
+
+    draw.circle(img, Color('yellow'), (c1, c2), 7)
+
     return img
 
-rect_a = rect_top
-rect_b = rect_mid
 
-dr = 0
-img = draw_ellipse(rotation,rect_fondo.size)
-do_draw = True
-text = render_text_b
-while True:
-    fps.tick(60)
-    events = event.get([QUIT, KEYDOWN, KEYUP])
-    event.clear()
-    for e in events:
-        if (e.type == QUIT) or (e.type==KEYDOWN and e.key==K_ESCAPE):
-            quit()
-            exit()
-        elif e.type==KEYDOWN:
-            if e.key == K_UP:
-                dr = -1
-                do_draw = True
-            elif e.key == K_DOWN:
-                dr = +1
-                do_draw = True
-            elif e.key == K_SPACE:
-                if rect_a == rect_top:
-                    rect_a = rect_mid
-                    rect_b = rect_top
-                    text = render_text_a
-                else:
-                    rect_a = rect_top
-                    rect_b = rect_mid
-                    text = render_text_b
-                rotation = 270
-                do_draw = True
-             
-        elif e.type == KEYUP:
-            dr = 0
-            do_draw = False
-    
-    if -90 <= rotation + dr <= 270:
-        rotation += dr
-        actual_rotation = round(abs(rotation-270),3)
-          
-    if do_draw == True:
-        img = draw_ellipse(rotation,rect_fondo.size)
-    
-    fondo.blit(img,(0,0))
-    fondo.blit(render_x, rect_x)
-    fondo.blit(render_y, rect_a)
-    fondo.blit(render_z, rect_b)
-    
-    fondo.fill(blanco,rect_text)
-    fondo.blit(text,rect_text)
-    
-    fondo.blit(render_rotation, rect_rotation)
-    fondo.blit(fuente2.render(str(actual_rotation)+'°',1,negro),rect_rotation.topright)
-    display.update()
+def rotation_loop():
+    rect_a = rect_top
+    rect_b = rect_mid
+    screen = display.set_mode((400, 440), SCALED)
+    delta = 0
+    canvas = None
+    do_draw = True
+    text = render_text_b
+    actual_rotation = 0
+    instruction = instruction1
+    running = True
+    rot = {'longitude of the ascending node': 0, 'argument of periapsis': 0}
+    rotation = 270
+    while running:
+        fps.tick(60)
+        events = event.get([QUIT, KEYDOWN, KEYUP])
+        event.clear()
+        for e in events:
+            if (e.type == QUIT) or (e.type == KEYDOWN and e.key == K_ESCAPE):
+                quit()
+                exit()
+            elif e.type == KEYDOWN:
+                if e.key == K_UP:
+                    delta = -1
+                    do_draw = True
+                elif e.key == K_DOWN:
+                    delta = +1
+                    do_draw = True
+                elif e.key == K_SPACE:
+                    if rect_a == rect_top:
+                        rect_a = rect_mid
+                        rect_b = rect_top
+                        text = render_text_a
+                        instruction = instruction2
+                        rot['longitude of the ascending node'] = actual_rotation
+                    else:
+                        running = False
+                        rot['argument of periapsis'] = actual_rotation
+                    rotation = 270
+                    do_draw = True
+
+            elif e.type == KEYUP:
+                delta = 0
+                do_draw = False
+
+        if -90 <= rotation + delta <= 270:
+            rotation += delta
+            actual_rotation = round(abs(rotation - 270), 3)
+
+        if do_draw is True:
+            canvas = draw_ellipse(rotation)
+
+        # screen = display.get_surface()
+        screen.fill(Color('grey'))
+        screen.blit(canvas, (0, 0))
+        screen.blit(render_x, rect_x)
+        screen.blit(render_y, rect_a)
+        screen.blit(render_z, rect_b)
+
+        screen.blit(text, rect_text)
+        screen.blit(instruction, rect_instruction)
+
+        screen.blit(render_rotation, rect_rotation)
+        screen.blit(fuente2.render(str(actual_rotation) + '°', 1, Color('black')), rect_rotation.topright)
+        display.update()
+
+    return rot
+
+
+__all__ = [
+    'rotation_loop',
+    'draw_ellipse'
+]
+
+if __name__ == '__main__':
+    data = rotation_loop()

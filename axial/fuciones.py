@@ -1,5 +1,5 @@
-﻿from math import cos, sin, pi, radians
-from pygame import draw, Surface
+﻿from pygame import draw, Surface, SRCALPHA
+from math import cos, sin, pi, radians
 from constantes import *
 
 
@@ -33,9 +33,8 @@ def interpolate(x, h):
 
 
 def lines(tilt):
-    frame = Surface((1200, 601))
+    frame = Surface((1200, 601), SRCALPHA)
     rect = frame.get_rect()
-    frame.fill(negro)
     equator = rect.centery
     draw.line(frame, verde, [0, equator], [rect.w, equator])
 

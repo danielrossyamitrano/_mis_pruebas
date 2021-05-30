@@ -10,7 +10,7 @@ consonants = ['m', 'n', 'ɲ', 'ŋ', 'b', 'd', 'g', 'b', 'd', 'g', 'w', 'ɹ', 'j'
               'ʃ', 'x', 'h']
 vowels = ["æ", "ʊ", "ɒ", "ɪ", "ə", 'aɪ', 'əʊ', 'ɪə', 'aʊ', 'ɔɪ', 'ɪʊ', 'aɪə', 'aʊə', 'ɔɪə']
 
-structure = "CCVCC"
+structure = "CVCC"
 for i in range(10):
     while "C" in structure or "V" in structure:
         item = choices(population, weights=commonness)[0]
@@ -20,4 +20,4 @@ for i in range(10):
             structure = structure.replace('V', item, 1)
 
     print(structure)
-    structure = 'CCVCC'
+    structure = 'CVCC'
