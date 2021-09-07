@@ -49,6 +49,9 @@ class PhonlogicalInventory(IPAConsonantChart):
 class IPASymbol:
     symbol = None
 
+    def __str__(self):
+        return self.symbol
+
 
 class IPAConsonant(IPASymbol):
 
@@ -68,15 +71,15 @@ class IPAVowel(IPASymbol):
 
 
 vowels = {
-    "open": frozenset(["æ"]),
+    "open": frozenset(["æ", "ɛ"]),
+    "mid": frozenset(["ə", "ɒ", "e̞"]),
     "close": frozenset(["ɪ", "ʊ"]),
-    "partial": frozenset(["ə", "ɒ"]),
 
     "rounded": frozenset(["æ", "ʊ", "ɒ"]),
-    "unrounded": frozenset(["ɪ", "ə"]),
+    "unrounded": frozenset(["ɪ", "ə", "e̞", "ɛ"]),
 
-    "front": frozenset(["æ", "ɪ"]),
-    "mid": frozenset(['ə']),
+    "front": frozenset(["æ", "ɪ", "e̞", "ɛ"]),
+    "central": frozenset(['ə']),
     "back": frozenset(["ʊ", "ɒ"])
 }
 
@@ -106,16 +109,19 @@ voicing = {
 
 Phonlogical_Inventory = []
 openess, roundness, frontness = 0, 0, 0
-for vowel in ["æ", "ɪ", "ʊ" "ə", "ɒ"]:
-    for how_open in ['open', 'close', 'partial']:
+for vowel in ["ɪ", "æ", "ə", "e̞", "ɛ", "ɒ", "ʊ"]:
+    for how_open in ['open', 'close', 'mid']:
         if vowel in vowels[how_open]:
             openess = how_open
+            break
     for how_round in ['rounded', 'unrounded']:
         if vowel in vowels[how_round]:
             roundness = how_round
-    for how_front in ['front', 'mid', 'back']:
+            break
+    for how_front in ['front', 'central', 'back']:
         if vowel in vowels[how_front]:
             frontness = how_front
+            break
     symbol = IPAVowel(vowel, openess, roundness, frontness)
     Phonlogical_Inventory.append(symbol)
 
@@ -123,13 +129,19 @@ _place, _manner, _voicing = 0, 0, 0
 for consonant in ['m', 'n', 'ɲ', 'ŋ', 'b', 'd', 'g', 'b', 'd', 'g', 'w', 'ɹ',
                   'j', 'r', 'l', 'p', 't', 'k', 'f', 'θ', 's', 'ʃ', 'x', 'h']:
     for the_place in place:
-        if consonant in vowels[the_place]:
+        if consonant in place[the_place]:
             _place = how_open
+            break
     for the_manner in manner:
-        if consonant in vowels[the_manner]:
+        if consonant in manner[the_manner]:
             _manner = how_round
+            break
     for the_voicing in voicing:
-        if consonant in vowels[the_voicing]:
+        if consonant in voicing[the_voicing]:
             _voicing = how_front
+            break
     symbol = IPAConsonant(consonant, _place, _manner, _voicing)
     Phonlogical_Inventory.append(symbol)
+
+print([str(i) for i in Phonlogical_Inventory])
+print(len(Phonlogical_Inventory))
