@@ -1,11 +1,9 @@
 __pycache__
 /.idea
-/behavior trees
 /rotate/rosa.xlsx
 /rotate/~$rosa.xlsx
-/walk/walk.xlsx
-/format/text.txt
-/format/format.txt
-/axial/lines/
-/axial/tilted.png
-/axial/latitudes.png
+/ForkMode7/README.md
+/ForkMode7/mainfest.mf
+/ForkMode7/build.xml
+/ForkMode7/.gitignore
+/ForkMode7/scr/
