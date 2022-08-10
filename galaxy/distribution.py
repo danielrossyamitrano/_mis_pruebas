@@ -1,9 +1,16 @@
 ﻿from math import pi, sin, cos, acos, floor
 from decimal import Decimal
 from random import choice
+from datetime import datetime
 
 
-def stellar_neighbourhood(galactic_radius, location, radius, density, seed=1, home_preference=None):
+def generate_id():
+    now = ''.join([char for char in str(datetime.now()) if char not in [' ', '.', ':', '-']])
+    # now = now[0:-5] + '-' + now[-5:]
+    return now[6:]
+
+
+def stellar_neighbourhood(galactic_radius, location, radius, density, seed=None, home_preference=None):
     # galactic characteristc
     galactic_habitable_zone_inner = galactic_radius * 0.47
     galactic_habitable_zone_outer = galactic_radius * 0.6
@@ -37,14 +44,19 @@ def stellar_neighbourhood(galactic_radius, location, radius, density, seed=1, ho
 
     # Total Stellar Mass Objects in Stellar Neighbourhood
     total_mass = Decimal(round(sum([o, b, a, f, g, k, m, w, d, other])))
-    stars = ['o']*o+['b']*b+['a']*a+['f']*f+['g']*g+['k']*k+['m']*m+['w']*w+['d']*d+['?']*other
+    stars = ['o'] * o + ['b'] * b + ['a'] * a + ['f'] * f + ['g'] * g + ['k'] * k + ['m'] * m + ['w'] * w + [
+        'd'] * d + ['?'] * other
     binary = round(((total_mass / Decimal(1.58)) * Decimal(0.33)))
     triple = round(((total_mass / Decimal(1.58)) * Decimal(0.08)))
     multiple = round(((total_mass / Decimal(1.58)) * Decimal(0.03)))
     single = round(total_mass - ((binary * 2) + (triple * 3) + (multiple * 4))) - 1
     total_systems = sum([single, binary, triple, multiple])
 
-    seed = Decimal(seed)
+    if seed is None:
+        seed = Decimal(int(generate_id()))
+    else:
+        seed = Decimal(seed)
+
     divisor = Decimal(2 ** 31 - 1)
     constante = Decimal(48271)
     initial_value = (constante * seed) % divisor
@@ -107,10 +119,6 @@ def stellar_neighbourhood(galactic_radius, location, radius, density, seed=1, ho
     return systems
 
 
-sistemas = stellar_neighbourhood(5000, 2500, 10, 0.004, seed=14528, home_preference='g')
+sistemas = stellar_neighbourhood(5000, 2500, 10, 0.040)
 for sistema in sistemas:
     print(sistema, sistemas[sistema])
-
-# as a general rule, the greater the distance between the center of the galaxy and the stellar neighbourhood, the
-# less material (aka density) there is to form stars, so the two values should be merged into one variable.
-# it is probably an exponential function.
